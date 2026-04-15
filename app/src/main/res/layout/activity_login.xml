@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.MainActivity">
+
+    <!--背景图片-->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fffbf0"
+        android:scaleType="fitXY"/>
+
+    <!--添加虚化层-->
+<!--    <io.alterac.blurkit.BlurLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:blk_fps="0"-->
+<!--        app:blk_blurRadius="25"/>-->
+
+    <!--猫头鹰-->
+    <RelativeLayout
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignTop="@id/bg"
+        android:layout_marginTop="-65dp"
+        >
+
+        <!--头像-->
+        <ImageView
+            android:id="@+id/iv_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/owl_head"
+            android:layout_centerHorizontal="true"/>
+
+        <!--手掌-->
+        <ImageView
+            android:id="@+id/iv_left_hand"
+            android:layout_width="50dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/icon_hand"
+            android:layout_alignParentLeft="true"
+            android:layout_alignBottom="@id/iv_head"
+            android:layout_marginBottom="-20dp"
+            android:layout_marginLeft="10dp"/>
+
+        <ImageView
+            android:id="@+id/iv_right_hand"
+            android:layout_width="50dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/icon_hand"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/iv_head"
+            android:layout_marginBottom="-20dp"
+            android:layout_marginRight="10dp"/>
+
+        <!--翅膀-->
+        <ImageView
+            android:id="@+id/iv_left_arm"
+            android:layout_width="65dp"
+            android:layout_height="40dp"
+            android:src="@mipmap/arm_left"
+            android:layout_below="@id/iv_head"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="23dp"/>
+
+        <ImageView
+            android:id="@+id/iv_right_arm"
+            android:layout_width="65dp"
+            android:layout_height="40dp"
+            android:src="@mipmap/arm_right"
+            android:layout_below="@id/iv_head"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"/>
+    </RelativeLayout>
+
+    <!--输入框背景-->
+    <io.alterac.blurkit.BlurLayout
+        android:id="@+id/bg"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="@drawable/input_bg_shape"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        app:blk_fps="0"
+        app:blk_blurRadius="20"/>
+
+
+    <!--添加标题和输入框视图-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp">
+
+        <!--标题-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Blog"
+            android:textColor="#000"
+            android:textSize="20dp"
+            android:textAlignment="center"/>
+
+        <!--添加输入框-->
+        <EditText
+            android:drawableStart="@mipmap/iconfont_user"
+            android:id="@+id/et_user"
+            style="@style/EditTextStyle"
+            android:inputType="text"
+            android:hint="请输入用户名"/>
+
+        <EditText
+            android:drawableStart="@mipmap/iconfont_password"
+            android:id="@+id/et_password"
+            style="@style/EditTextStyle"
+            android:inputType="textPassword"
+            android:hint="请输入密码"/>
+
+        <!--添加按钮-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/bt_login"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="登录"
+                android:layout_weight="1"
+                android:textColor="#ffffff"
+                android:layout_marginTop="20dp"
+                android:enabled="false"
+                android:background="@drawable/login_selector"/>
+            <Button
+                android:layout_marginLeft="20dp"
+                android:id="@+id/bt_register"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="注册"
+                android:textColor="#ffffff"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/login_selector"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

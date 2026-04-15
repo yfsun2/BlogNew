@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#F0F3F6"
+    tools:context=".fragment.MyFragment">
+    <androidx.appcompat.widget.Toolbar
+        android:background="#07C160"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="我的"
+            android:textColor="@color/white"
+            android:textSize="22dp"/>
+    </androidx.appcompat.widget.Toolbar>
+
+    <com.syf.blognew.view.RoundImageView
+        android:id="@+id/portrait"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:src="@mipmap/backg"
+        app:type="circle"
+        android:scaleType="fitXY"
+        android:layout_width="80dp"
+        android:layout_height="80dp"/>
+
+    <LinearLayout style="@style/wrap_layout" >
+         <!-- 上圆角-->
+         <LinearLayout style="@style/top_layout">
+             <TextView style="@style/usertext" android:text="个性签名" />
+               <ImageView style="@style/img_arrow"/>
+         </LinearLayout>
+
+         <!-- 分割线 -->
+           <View style="@style/bg_line"/>
+           <!-- 无圆角-->
+        <LinearLayout style="@style/mid_layout"
+                      android:clickable="true"
+                      android:id="@+id/my_introduce">
+             <TextView
+                     style="@style/usertext"
+                     android:clickable="false"
+                     android:text="我的资料" />
+               <ImageView android:clickable="false" style="@style/img_arrow"/>
+         </LinearLayout>
+              <View style="@style/bg_line"/>
+           <!-- 下圆角-->
+        <LinearLayout style="@style/bottom_layout">
+             <TextView style="@style/usertext" android:text="消息通知" />
+               <ImageView style="@style/img_arrow"/>
+         </LinearLayout>
+
+     </LinearLayout>
+
+
+          <!-- 全圆角-->
+         <LinearLayout style="@style/wrap_layout">
+             <LinearLayout style="@style/single_layout">
+                 <TextView style="@style/usertext" android:text="辅助功能"/>
+                 <ImageView style="@style/img_arrow"/>
+             </LinearLayout>
+
+         </LinearLayout>
+
+    <Button
+        android:id="@+id/logout"
+        android:background="@drawable/button_selector"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center"
+        android:textColor="@color/white"
+        android:text="退出登录"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--无效状态 灰色背景 圆角矩形-->
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <corners android:radius="10dp" />
+            <solid android:color="#bbb" />
+        </shape>
+    </item>
+    <item android:state_pressed="false">
+        <shape>
+            <stroke android:width="1px" android:color="#4486FF" />
+            <corners android:radius="10dp" />
+            <solid android:color="#4486FF" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape>
+            <stroke android:width="1px" android:color="#9EC0FF" />
+            <corners android:radius="10dp" />
+            <solid android:color="#9EC0FF" />
+        </shape>
+    </item>
+</selector>
