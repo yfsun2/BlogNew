@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout style="@style/jmui_chat_item_send_layout"
               xmlns:android="http://schemas.android.com/apk/res/android">
-
-
     <TextView
         android:id="@+id/tv_sendtime"
+        android:text="2026-01-01 00:00:00"
         style="@style/jmui_chat_text_date_style"/>
-
+    <TextView
+        android:id="@+id/tv_withdraw"
+        android:text="你撤回了一条消息"
+        android:visibility="gone"
+        style="@style/jmui_chat_text_date_style"/>
     <LinearLayout
+        android:id="@+id/ll_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:gravity="right"
+        android:visibility="visible"
         android:orientation="horizontal">
 
         <ImageButton
@@ -54,16 +59,16 @@
             android:paddingLeft="10dp"
             android:paddingRight="18dp"
             android:textColorLink="#157BFB"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/ll_push"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="3dp"
-            android:background="@mipmap/business_card_bg"
+            android:background="@mipmap/pay_send"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -73,6 +78,7 @@
                     android:id="@+id/iv_push_img"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:background="@mipmap/pay"
                     android:layout_marginBottom="12.33dp"
                     android:layout_marginLeft="11dp"
                     android:layout_marginTop="13.33dp"/>
@@ -85,23 +91,25 @@
 
                     <TextView
                         android:id="@+id/tv_menuName"
-                        android:layout_width="120dp"
+                        android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="11.33dp"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:textColor="#2C2C2C"
+                        android:text="10积分"
+                        android:textColor="#fff"
                         android:textSize="15sp"/>
 
                     <TextView
                         android:id="@+id/tv_pushContent"
+                        android:text="你发起了一笔转账"
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="11.33dp"
                         android:layout_marginTop="4dp"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:textColor="#999999"
+                        android:textColor="#fff"
                         android:textSize="12sp"/>
                 </LinearLayout>
             </LinearLayout>
@@ -119,8 +127,8 @@
                 android:layout_marginBottom="3dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="3dp"
-                android:text="消息推送"
-                android:textColor="#989898"
+                android:text="积分转账"
+                android:textColor="#fff"
                 android:textSize="10sp"/>
 
         </LinearLayout>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@android:color/transparent">
+
+    <!-- 红包主体 -->
+    <LinearLayout
+        android:layout_width="280dp"
+        android:layout_height="360dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/bg_red_packet">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="恭喜获得红包"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:letterSpacing="0.1"/>
+
+        <!-- 开红包按钮区域 -->
+        <TextView
+            android:id="@+id/btn_open_packet"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/btn_open_circle"
+            android:gravity="center"
+            android:text="点击拆开"
+            android:textColor="#fff"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
+    <!-- 关闭按钮 -->
+    <ImageView
+        android:id="@+id/iv_close"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="15dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+
+</LinearLayout>

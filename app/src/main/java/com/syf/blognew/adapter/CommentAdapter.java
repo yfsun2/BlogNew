@@ -17,7 +17,7 @@ public class CommentAdapter extends AbstractAdapter<CommentVO> {
     }
 
     @Override
-    public void bindView(ViewHolder holder, CommentVO obj) {
+    public void bindView(ViewHolder holder,int position, CommentVO obj) {
         holder.setText(R.id.fromId, obj.getFromUser());
         if (obj.getToUser() == null) {
             holder.setVisibility(R.id.replay, View.GONE);

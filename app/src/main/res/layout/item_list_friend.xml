@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:background="#fff"
     android:padding="10dp"
     android:paddingVertical="8dp">
-
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
-
         <com.syf.blognew.view.RoundImageView
             android:id="@+id/touxiang"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:scaleType="fitXY"
             android:layout_gravity="center_vertical"
-            android:src="@mipmap/backg"
+            android:src="@mipmap/ic_default_avatar"
             app:type="circle" />
 
         <!-- 未读消息红点 -->
@@ -51,7 +51,7 @@
             <TextView
                 android:id="@+id/username"
                 android:text="张三丰"
-                android:textSize="22dp"
+                android:textSize="20sp"
                 android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -59,14 +59,16 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:gravity="right"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent"
+                tools:ignore="RtlHardcoded">
 
                 <TextView
                     android:layout_marginRight="30dp"
                     android:id="@+id/last_time"
                     android:text="5/15"
-                    android:textSize="14dp"
+                    android:textSize="14sp"
                     android:textColor="#888"
+                    android:layout_gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>
@@ -75,7 +77,7 @@
         <TextView
             android:id="@+id/last_words"
             android:text="最新一条聊天信息"
-            android:textSize="15dp"
+            android:textSize="14sp"
             android:layout_gravity="center_vertical"
             android:textColor="#888"
             android:layout_width="wrap_content"

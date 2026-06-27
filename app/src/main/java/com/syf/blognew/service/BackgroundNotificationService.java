@@ -16,37 +16,34 @@ import androidx.core.app.NotificationCompat;
 import com.alibaba.fastjson.JSONObject;
 import com.syf.blognew.R;
 import com.syf.blognew.activity.MainActivity;
+import com.syf.blognew.activity.NoticeActivity;
+import com.syf.blognew.handler.ToastHandler;
 import com.syf.blognew.websocket.WebSocketManager;
 
 import java.util.Objects;
 
 public class BackgroundNotificationService extends Service {
-    private static final String CHANNEL_ID = "background_service_channel";
     private static final int NOTIFICATION_ID = 1001;
-
-    // 退出登录的广播Action
+    private static final String CHANNEL_ID = "background_service_channel";
     public static final String ACTION_LOGOUT = "com.syf.blognew.LOGOUT";
+    public static final String ACTION_NEW_MESSAGE = "com.syf.blognew.NEW_MESSAGE";
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
+        ToastHandler.showToast("通知服务已开启");
         startForeground(NOTIFICATION_ID, createForegroundNotification());
-
-        // 注册手动通知广播
-        IntentFilter filter = new IntentFilter(ACTION_SHOW_NOTIFICATION);
-        registerReceiver(notificationReceiver, filter);
-
         // 注册消息广播
-        registerReceiver(mMsgReceiver, new IntentFilter("NEW_MESSAGE"));
-
+        registerReceiver(messageReceiver, new IntentFilter(ACTION_NEW_MESSAGE));
         // 注册退出登录广播
-        IntentFilter logoutFilter = new IntentFilter(ACTION_LOGOUT);
-        registerReceiver(logoutReceiver, logoutFilter);
+        registerReceiver(logoutReceiver, new IntentFilter(ACTION_LOGOUT));
 
         // 启动websocket
-        WebSocketManager.getInstance().loginSuccess();
+        new Thread(() -> {
+            WebSocketManager.getInstance().loginSuccess();
+        }, "WebSocket-Background-Thread").start();
     }
 
     @Override
@@ -74,14 +71,19 @@ public class BackgroundNotificationService extends Service {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Blog")
                 .setContentText("后台运行中，实时接收消息")
-                .setSmallIcon(R.drawable.app)
+                .setSmallIcon(R.mipmap.app)
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
                 .build();
     }
 
-    private void sendLocalNotification(String title, String content) {
-        Intent intent = new Intent(this, MainActivity.class);
+    private void sendLocalNotification(String title, String content,int type) {
+        Intent intent;
+        if(type==0){
+            intent = new Intent(this, MainActivity.class);
+        }else{
+            intent = new Intent(this, NoticeActivity.class);
+        }
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
@@ -90,7 +92,7 @@ public class BackgroundNotificationService extends Service {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(content)
-                .setSmallIcon(R.drawable.app)
+                .setSmallIcon(R.mipmap.app)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build();
@@ -100,30 +102,15 @@ public class BackgroundNotificationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(notificationReceiver);
-        unregisterReceiver(mMsgReceiver);
+        unregisterReceiver(messageReceiver);
         unregisterReceiver(logoutReceiver);
-
+        ToastHandler.showToast("通知服务被关闭");
         // 关闭websocket
         WebSocketManager.getInstance().logoutAndClose();
     }
 
-    // ============== 手动发通知 ==============
-    public static final String ACTION_SHOW_NOTIFICATION = "com.syf.blognew.SHOW_NOTIFICATION";
-    public static final String EXTRA_TITLE = "title";
-    public static final String EXTRA_CONTENT = "content";
-
-    private final BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String title = intent.getStringExtra(EXTRA_TITLE);
-            String content = intent.getStringExtra(EXTRA_CONTENT);
-            sendLocalNotification(title, content);
-        }
-    };
-
     // ============== 接收聊天消息 ==============
-    private final BroadcastReceiver mMsgReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String json = intent.getStringExtra("message");
@@ -136,9 +123,16 @@ public class BackgroundNotificationService extends Service {
                 String content = obj.getString("msg");
                 int fromId=obj.getIntValue("fromId");
                 int online=obj.getInteger("online");
+                int msgType=obj.getInteger("msgType");
                 if(online!=fromId){//我的聊天界面不是对面
-                    sendLocalNotification("你有1条来自"+fromName+"的新消息", content);
+                    if(msgType==0){
+                        sendLocalNotification("你有一条来自"+fromName+"的新消息", content,0);
+                    }else{
+                        sendLocalNotification("你有一条来自"+fromName+"的新消息", "[积分转账]"+content+"积分",0);
+                    }
                 }
+            }else if(Objects.equals(type, "notice")){
+                sendLocalNotification("你有一条新的通知", "点击查看详情",1);
             }
         }
     };

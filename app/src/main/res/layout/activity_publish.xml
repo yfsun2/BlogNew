@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.PublishActivity"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <!-- 顶部导航栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#FFFFFF"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:elevation="1dp">
+        <TextView
+            android:id="@+id/tv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:text="取消"
+            android:textColor="#333333"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="发送博客"
+            android:textSize="18sp"
+            android:textColor="#333333"
+            android:textStyle="bold"
+            android:gravity="center"
+            />
+<!--        <TextView-->
+<!--            android:id="@+id/add_gift"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginLeft="15dp"-->
+<!--            android:text="添加"-->
+<!--            android:textColor="#333333"-->
+<!--            android:textSize="16sp" />-->
+        <Button
+            android:id="@+id/btn_add_blog"
+            android:text="发送"
+            android:textColor="@color/white"
+            android:background="@drawable/btn_selector"
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="15dp"
+        android:layout_margin="20dp"
+        android:background="#fff">
+        <EditText
+            android:hint="分享新鲜事..."
+            android:background="@drawable/edit_blog"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_height="200dp"
+            android:inputType="textMultiLine"
+            android:gravity="start|top"
+            android:id="@+id/text"
+            android:autofillHints="请输入内容"/>
+        <GridLayout
+            android:id="@+id/layout_images"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:orientation="horizontal"/>
+    </LinearLayout>
+</LinearLayout>

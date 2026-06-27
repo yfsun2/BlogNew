@@ -5,103 +5,168 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:paddingHorizontal="50dp"
-    android:paddingTop="50dp"
-    android:background="#fffbf0"
-    tools:context=".activity.RegisterActivity"
-    >
+    android:gravity="center"
+    android:background="#F0F3F6"
+    tools:context=".activity.RegisterActivity">
 
-    <TextView
-        android:text="新用户注册"
-        android:textSize="30dp"
-        android:gravity="center"
-        android:textColor="@color/black"
-        android:layout_marginBottom="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <EditText
-        android:id="@+id/name"
-        android:hint="用户名"
-        android:padding="10dp"
-        android:background="@drawable/edit_text"
+    <!-- 卡片容器：带圆角 + 阴影 -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:inputType="text" />
+        app:cardCornerRadius="24dp"
+        app:cardElevation="8dp"
+        app:cardUseCompatPadding="true"
+        android:background="@android:color/white">
+        <!-- 最外层 FrameLayout 实现悬浮效果 -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="28dp">
 
-    <EditText
-        android:id="@+id/password"
-        android:hint="密码"
-        android:layout_marginBottom="20dp"
-        android:inputType="textPassword"
-        android:background="@drawable/edit_text"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <EditText
-        android:id="@+id/password2"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/edit_text"
-        android:padding="10dp"
-        android:hint="确认密码"
-        android:inputType="textPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:layout_marginBottom="20dp"
-        android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/email"
-            android:hint="邮箱"
-            android:inputType="textEmailAddress"
-            android:background="@drawable/edit_text"
+                <!-- 标题 -->
+                <TextView
+                    android:text="新用户注册"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="30dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <!-- 用户名 -->
+                <EditText
+                    android:id="@+id/name"
+                    android:hint="请输入用户名"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp"
+                    android:background="@drawable/shape_edit_round"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:textSize="15sp"
+                    android:inputType="text"/>
+
+                <!-- 密码 -->
+                <EditText
+                    android:id="@+id/password"
+                    android:hint="请输入密码"
+                    android:layout_marginBottom="16dp"
+                    android:inputType="textPassword"
+                    android:background="@drawable/shape_edit_round"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp"
+                    android:textSize="15sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <!-- 确认密码 -->
+                <EditText
+                    android:id="@+id/password2"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/shape_edit_round"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp"
+                    android:hint="请确认密码"
+                    android:inputType="textPassword"
+                    android:textSize="15sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <!-- 邮箱 + 验证码 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center_vertical"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/email"
+                        android:hint="请输入邮箱"
+                        android:inputType="textEmailAddress"
+                        android:background="@drawable/shape_edit_round"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="14dp"
+                        android:textSize="15sp"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"/>
+
+                    <Button
+                        android:id="@+id/send"
+                        android:background="@drawable/shape_btn_round"
+                        android:text="发送验证码"
+                        android:enabled="false"
+                        android:textColor="#fff"
+                        android:textSize="13sp"
+                        android:paddingHorizontal="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="46dp"/>
+
+                </LinearLayout>
+
+                <!-- 验证码输入 -->
+                <EditText
+                    android:id="@+id/code"
+                    android:hint="请输入验证码"
+                    android:inputType="number"
+                    android:background="@drawable/shape_edit_round"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="24dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <!-- 按钮组 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/ok"
+                        android:text="确认注册"
+                        android:enabled="false"
+                        android:background="@drawable/shape_btn_round"
+                        android:textColor="#fff"
+                        android:textSize="16sp"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"/>
+
+                    <Button
+                        android:id="@+id/reset"
+                        android:layout_marginStart="10dp"
+                        android:text="重置"
+                        android:background="@drawable/shape_btn_gray"
+                        android:textColor="#333"
+                        android:textSize="16sp"
+                        android:layout_weight="1"
+                        android:stateListAnimator="@null"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top|end"
             android:padding="10dp"
-            android:layout_weight="9"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/send"
-            android:background="@drawable/button_selector"
-            android:text="发送验证码"
-            android:enabled="false"
-            android:layout_marginLeft="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <EditText
-        android:id="@+id/code"
-        android:hint="验证码"
-        android:inputType="number"
-        android:background="@drawable/edit_text"
-        android:padding="10dp"
-        android:layout_marginBottom="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/ok"
-            android:text="确认"
-            android:enabled="false"
-            android:background="@drawable/button_selector"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/reset"
-            android:layout_marginLeft="10dp"
-            android:text="重置"
-            android:background="@drawable/button_selector"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
+            android:src="@mipmap/ic_clear"
+            android:scaleType="centerInside"/>
 
+    </FrameLayout>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

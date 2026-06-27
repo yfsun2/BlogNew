@@ -1,13 +1,13 @@
 package com.syf.blognew.websocket;
 
+import static com.syf.blognew.service.BackgroundNotificationService.ACTION_NEW_MESSAGE;
+
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import com.alibaba.fastjson2.JSONObject;
+import com.syf.blognew.handler.ToastHandler;
 import com.syf.blognew.pojo.UserApplication;
 import com.syf.blognew.pojo.entity.User;
 import com.syf.blognew.util.SpUtil;
@@ -30,15 +30,16 @@ public class WebSocketManager {
     @Getter
     @Setter
     private User user;  // 当前登录用户
-    private boolean isConnecting = false;
+    public boolean isConnecting = false;
     private boolean isLogout = false; // 退出登录标记
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
-    // 单例
     public static WebSocketManager getInstance() {
         if (instance == null) {
-            instance = new WebSocketManager();
+            synchronized (WebSocketManager.class){
+                if(instance==null) instance = new WebSocketManager();
+            }
         }
         return instance;
     }
@@ -55,8 +56,8 @@ public class WebSocketManager {
         isConnecting = true;
 
         // 每次连接都重新获取最新用户（解决切换账号不变问题）
-        if (SpUtil.getUser() != null && !SpUtil.getUser().isEmpty()) {
-            user = JSONObject.parseObject(SpUtil.getUser(), User.class);
+        if (SpUtil.getUser() != null ) {
+            user = SpUtil.getUser();
         } else {
             user = null;
         }
@@ -76,16 +77,14 @@ public class WebSocketManager {
 
             @Override
             public void onMessage(String message) {
-                Intent intent = new Intent("NEW_MESSAGE");
+                Intent intent = new Intent(ACTION_NEW_MESSAGE);
                 intent.putExtra("message", message);
                 UserApplication.getAppContext().sendBroadcast(intent);
-//                LocalBroadcastManager.getInstance(UserApplication.getAppContext()).sendBroadcast(intent);
             }
 
             @Override
             public void onClose(int code, String reason, boolean remote) {
                 isConnecting = false;
-
                 // 退出登录 → 不再重连！！！
                 if (isLogout) {
                     return;
@@ -105,6 +104,20 @@ public class WebSocketManager {
         webSocketClient.connect();
     }
 
+    public boolean sendMessageToServer(String message) {
+        try {
+            if (webSocketClient != null && webSocketClient.isOpen()) {
+                webSocketClient.send(message);
+                return true;
+            } else {
+                Log.e("WebSocket", "发送失败：WebSocket未连接");
+            }
+        } catch (Exception e) {
+            Log.e("WebSocket", "发送消息异常：" + e.getMessage());
+        }
+        return false;
+    }
+
     // 退出登录时调用（关键！）
     public void logoutAndClose() {
         isLogout = true;
@@ -113,6 +126,7 @@ public class WebSocketManager {
             webSocketClient = null;
         }
         user = null;
+        ToastHandler.showToast("退出登录");
     }
 
     // 登录成功后调用（重置状态）

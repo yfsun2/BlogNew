@@ -343,12 +343,13 @@ public abstract class AbstractMultiAdapter<T> extends BaseAdapter {
             return bitmap;
         }
 
-
-        /**
-         * 设置点击监听
-         */
         public ViewHolder setOnClickListener(int id, View.OnClickListener listener) {
             getView(id).setOnClickListener(listener);
+            return this;
+        }
+
+        public ViewHolder setOnLongClickListener(int id,View.OnLongClickListener listener){
+            getView(id).setOnLongClickListener(listener);
             return this;
         }
 

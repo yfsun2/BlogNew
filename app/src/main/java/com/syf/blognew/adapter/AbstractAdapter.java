@@ -73,11 +73,11 @@ public abstract class AbstractAdapter<T> extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = ViewHolder.bind(parent.getContext(), convertView, parent, mLayoutRes, position);
-        bindView(holder, getItem(position));
+        bindView(holder,position,getItem(position));
         return holder.getItemView();
     }
 
-    public abstract void bindView(ViewHolder holder, T obj);
+    public abstract void bindView(ViewHolder holder, int position,T obj);
 
     public void add(T data) {
         if (mData == null) mData = new ArrayList<>();
@@ -186,90 +186,18 @@ public abstract class AbstractAdapter<T> extends BaseAdapter {
                     .load(url)
                     .centerCrop()
                     .into(iv);
-
             return this;
         }
 
-        public ViewHolder setButtonLeftImg(int id, String first, int paddingDp) {
-            Button btn = getView(id);
-            btn.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-            Bitmap bitmap=getBitmapByFirst(String.valueOf(first.charAt(0)));
-            bitmap=toRoundBitmap(bitmap);
-            if (bitmap != null) {
-                BitmapDrawable drawable = new BitmapDrawable(btn.getResources(), bitmap);
-                // 这里可以统一设置大小，也可以用 intrinsicBounds
-                int iconSize = dp2px(btn.getContext(), 30);
-                drawable.setBounds(0, 0, iconSize, iconSize);
-                btn.setCompoundDrawables(drawable, null, null, null);
-                btn.setCompoundDrawablePadding(dp2px(btn.getContext(), paddingDp));
-            }
+        public ViewHolder clearImageUrl(int id) {
+            ImageView iv = getView(id);
+            // 无头像：必须先取消 Glide，再设置文字头像
+            Glide.with(iv.getContext()).clear(iv); // 关键！取消加载
+            iv.setImageDrawable(null);  // 清空图片
+            iv.setImageBitmap(null);
             return this;
         }
 
-        private Bitmap toRoundBitmap(Bitmap bitmap) {
-            if (bitmap == null) return null;
-
-            int size = Math.min(bitmap.getWidth(), bitmap.getHeight());
-            Bitmap output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(output);
-
-            Paint paint = new Paint();
-            Rect rect = new Rect(0, 0, size, size);
-
-            paint.setAntiAlias(true);
-            canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(bitmap, null, rect, paint);
-
-            return output;
-        }
-
-        private int dp2px(Context context, float dp) {
-            final float scale = context.getResources().getDisplayMetrics().density;
-            return (int) (dp * scale + 0.5f);
-        }
-
-        // ------------ 你原来的（文字头像）------------
-
-        // ------------ 我给你新增的（URL 网络图片）------------
-        public ViewHolder setButtonLeftUrl(int id, String imageUrl, int paddingDp) {
-            Button btn = getView(id);
-            btn.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-
-            if (imageUrl == null || imageUrl.isEmpty()) {
-                return this;
-            }
-
-            int iconSize = dp2px(btn.getContext(), 30);
-
-            Glide.with(btn.getContext())
-                    .asBitmap()
-                    .load(imageUrl)
-                    .centerCrop() // 保证圆形不拉伸
-                    .override(iconSize, iconSize)
-                    .into(new CustomTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                            // 直接用你现成的圆角方法！
-                            Bitmap roundBitmap = toRoundBitmap(resource);
-                            BitmapDrawable drawable = new BitmapDrawable(btn.getResources(), roundBitmap);
-                            drawable.setBounds(0, 0, iconSize, iconSize);
-
-                            btn.post(() -> {
-                                btn.setCompoundDrawables(drawable, null, null, null);
-                                btn.setCompoundDrawablePadding(dp2px(btn.getContext(), paddingDp));
-                            });
-                        }
-
-                        @Override
-                        public void onLoadCleared(@Nullable Drawable placeholder) {}
-                    });
-
-            return this;
-        }
-
-
-        // ====================== 修复 2：文字头像 ======================
         public ViewHolder setImageWord(int id, String first) {
             if(first==null||first.isEmpty()) return this;
             ImageView iv = getView(id);
@@ -288,36 +216,33 @@ public abstract class AbstractAdapter<T> extends BaseAdapter {
 
             gridLayout.setColumnCount(3);
 
-            // ====================== 修复位置 ======================
-            // 原来的代码会越刷新越小
-            // int totalWidth = gridLayout.getWidth();
-            // 改成：永远使用 屏幕宽度 计算，固定不变！
-            int totalWidth = context.getResources().getDisplayMetrics().widthPixels;
+            // 屏幕总宽度
+            int screenWidth = context.getResources().getDisplayMetrics().widthPixels;
 
-            // 减去列表左右的padding（如果你列表有10dp左右边距，就减20）
-            // 没有就写 0
-            int offset = 60;
-            int imageWidth = (totalWidth - offset) / 3;
-            int imageHeight = imageWidth;
+            int space = 20;
 
-            int space = 20; // 间距保持你原来的5
+            // ✅ 核心正确公式：一行3张，刚好占满屏幕
+            int itemWidth = (screenWidth - 9 * space) / 3;
 
             for (int i = 0; i < imageList.size(); i++) {
-                String imageUrl = imageList.get(i);
                 ImageView imageView = new ImageView(context);
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
                 GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                // ====================== 修复：减去间距，防止撑出界面 ======================
-                params.width = imageWidth - space * 2;
-                params.height = imageHeight - space * 2;
-                params.setMargins(space, space, space, space);
+                params.width = itemWidth;       // 宽度正确
+                params.height = itemWidth;      // 正方形
+
+                // ✅ 关键：只加右边距和下边距，不挤压
+                if (i % 3 != 0) {
+                    params.leftMargin = space;
+                }
+                params.bottomMargin = space;
 
                 imageView.setLayoutParams(params);
 
                 Glide.with(context)
-                        .load(imageUrl)
-                        .placeholder(R.drawable.moren)
+                        .load(imageList.get(i))
+                        .placeholder(R.mipmap.moren)
                         .into(imageView);
 
                 int finalI = i;

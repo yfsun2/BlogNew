@@ -45,6 +45,8 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.activity:activity:1.8.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -61,4 +63,8 @@ dependencies {
     implementation("io.github.scwang90:refresh-header-classics:2.1.1")
     implementation("io.github.scwang90:refresh-footer-classics:2.1.1")
     implementation("com.github.donkingliang:ImageSelector:2.2.1")
+    implementation("com.google.zxing:core:3.5.1")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+//    implementation("cn.jiguang.im:chat:3.7.0")
+//    implementation("cn.jiguang.im:ui:3.7.0")
 }

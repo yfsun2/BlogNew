@@ -2,6 +2,7 @@ package com.syf.blognew.pojo.vo;
 
 import com.syf.blognew.pojo.entity.User;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class FriendVO {
     private User user;
     private int unReadCount;
+    private int msgType;
     private String lastMessage;
-    private Date lastTime;
+    private LocalDateTime lastTime;
 }

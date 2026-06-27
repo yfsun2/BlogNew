@@ -1,5 +1,6 @@
 package com.syf.blognew.pojo.vo;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -15,10 +16,11 @@ public class BlogVO {
     private Integer userId;
     private String model;
     private String context;
-    private Date createTime;
+    private int isPrivate;
+    private LocalDateTime createTime;
     private String name;
     private String url;
-    private byte[] pic;
+    private String pic;
     private List<CommentVO> commentList;
     private List<String> supportList;
     private Integer isSupport;

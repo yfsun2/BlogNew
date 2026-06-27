@@ -3,42 +3,77 @@ package com.syf.blognew.adapter;
 import android.view.View;
 
 import com.syf.blognew.R;
-import com.syf.blognew.pojo.vo.ChatMessage;
-import com.syf.blognew.pojo.UserApplication;
-import com.syf.blognew.handler.ToastHandler;
+import com.syf.blognew.pojo.vo.MessageVO;
+import com.syf.blognew.util.Utils;
 
-import org.java_websocket.client.WebSocketClient;
-
-import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 
-public class MessageAdapter extends AbstractMultiAdapter<ChatMessage>{
+public class MessageAdapter extends AbstractMultiAdapter<MessageVO>{
 
-    private final SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
-    List<ChatMessage> mData;
+    List<MessageVO> mData;
 
     // 1. 定义接口
-    public interface OnRetryClickListener {
-        void onRetryClick(int position, ChatMessage failedMessage);
+    public interface OnMessageClickListener {
+        void onRetryClick(int position, MessageVO failedMessage);
+        void onTransferClick(int position,MessageVO message);
+        void onLongClick(View view,int position,MessageVO message);
     }
 
-    private OnRetryClickListener mRetryListener;
+    private OnMessageClickListener listener;
 
     // 2. 提供设置方法
-    public void setOnRetryClickListener(OnRetryClickListener listener) {
-        this.mRetryListener = listener;
+    public void setOnRetryClickListener(OnMessageClickListener listener) {
+        this.listener = listener;
     }
-    public MessageAdapter(List<ChatMessage> mData) {
+    public MessageAdapter(List<MessageVO> mData) {
         super(mData);
         this.mData=mData;
     }
 
     @Override
-    public void bindView(ViewHolder holder, ChatMessage obj, int position) {
-        if (this.getItemViewType(position)==0){
-            holder.setText(R.id.tv_content,obj.getContent());
-            holder.setText(R.id.tv_sendtime,sdf.format(obj.getTime()));
+    public void bindView(ViewHolder holder, MessageVO obj, int position) {
+        boolean showTime = true;
+        // 不是第一条，和上一条比「整分钟」
+        if (position > 0) {
+            MessageVO pre = mData.get(position - 1);
+            LocalDateTime currMin = trimToMinute(obj.getCreateTime());
+            LocalDateTime preMin = trimToMinute(pre.getCreateTime());
+            // 同一自然分钟 → 隐藏时间
+            if (currMin.isEqual(preMin)) {
+                showTime = false;
+            }
+        }
+
+        if (showTime) {
+            holder.setVisibility(R.id.tv_sendtime,View.VISIBLE);
+        } else {
+            holder.setVisibility(R.id.tv_sendtime,View.GONE);
+        }
+
+
+        if (this.getItemViewType(position)==0){//发送方
+
+            holder.setText(R.id.tv_sendtime, Utils.timeFormatter(obj.getCreateTime()));
+
+            if(obj.getIsWithdraw()==1){
+                holder.setVisibility(R.id.tv_withdraw,View.VISIBLE);
+                holder.setText(R.id.tv_withdraw,"你撤回了一条消息");
+                holder.setVisibility(R.id.ll_message,View.GONE);
+                return;
+            }else{
+                holder.setVisibility(R.id.tv_withdraw,View.GONE);
+                holder.setVisibility(R.id.ll_message,View.VISIBLE);
+            }
+
+
+            if(obj.getUrl()!=null&&!obj.getUrl().isEmpty()){
+                holder.setImageUrl(R.id.jmui_avatar_iv,obj.getUrl());
+            }else{
+                holder.setImageWord(R.id.jmui_avatar_iv,obj.getUserName());
+            }
+
             if(obj.getIsRead()==0){//未读
                 holder.setVisibility(R.id.tv_isRead,View.VISIBLE);
                 holder.setVisibility(R.id.jmui_fail_resend_ib,View.GONE);
@@ -59,29 +94,98 @@ public class MessageAdapter extends AbstractMultiAdapter<ChatMessage>{
                 holder.setVisibility(R.id.jmui_sending_iv,View.GONE);
             }
 
-            if(obj.getUrl()!=null&&!obj.getUrl().isEmpty()){
-                holder.setImageUrl(R.id.jmui_avatar_iv,obj.getUrl());
-            }else{
-                holder.setImageWord(R.id.jmui_avatar_iv,obj.getUserName());
-            }
 
             holder.setOnClickListener(R.id.jmui_fail_resend_ib,v->{
-
-                if (mRetryListener != null) {
+                if (listener != null) {
                     // 把位置和失败的消息传给 Activity
-                    mRetryListener.onRetryClick(position, mData.get(position));
+                    listener.onRetryClick(position, mData.get(position));
                 }
-
             });
-        }else {
-            holder.setText(R.id.tv_content,obj.getContent());
-            holder.setText(R.id.tv_sendtime,sdf.format(obj.getTime()));
-            holder.setText(R.id.tv_display_name,"远程");
-            if(obj.getUrl()!=null&&!obj.getUrl().isEmpty()){
-                holder.setImageUrl(R.id.jmui_avatar_iv,obj.getUrl());
+
+            if(obj.getMsgType()==0){//普通消息
+                holder.setVisibility(R.id.ll_push,View.GONE);
+                holder.setVisibility(R.id.tv_content,View.VISIBLE);
+                holder.setText(R.id.tv_content,obj.getContent());
+            }else{//转账消息
+                holder.setVisibility(R.id.tv_content,View.GONE);
+                holder.setVisibility(R.id.ll_push,View.VISIBLE);
+
+                holder.setText(R.id.tv_menuName,obj.getContent()+"积分");
+
+                if(obj.getIsReceive()==0){//转账未接收
+                    holder.setText(R.id.tv_pushContent,"你发起了一笔转账");
+                    holder.setImageResource(R.id.ll_push,R.mipmap.pay_send);
+                }else if(obj.getIsReceive()==1){//转账已接收
+                    holder.setText(R.id.tv_pushContent,"已被接收");
+                    holder.setImageResource(R.id.ll_push,R.mipmap.pay_send_ok);
+                }else{//转账被接收回执
+                    holder.setText(R.id.tv_pushContent,"已收款");
+                    holder.setImageResource(R.id.ll_push,R.mipmap.pay_send_ok);
+                }
+            }
+
+            holder.setOnLongClickListener(R.id.tv_content, new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    listener.onLongClick(view,position,mData.get(position));
+                    return true;
+                }
+            });
+
+        }else {//接收方
+
+            holder.setText(R.id.tv_sendtime, Utils.timeFormatter(obj.getCreateTime()));
+
+            if(obj.getIsWithdraw()==1){
+                holder.setVisibility(R.id.tv_withdraw,View.VISIBLE);
+                holder.setText(R.id.tv_withdraw,"对方撤回了一条消息");
+                holder.setVisibility(R.id.ll_message,View.GONE);
+                return;
             }else{
-                holder.setImageWord(R.id.jmui_avatar_iv,obj.getUserName());
+                holder.setVisibility(R.id.tv_withdraw,View.GONE);
+                holder.setVisibility(R.id.ll_message,View.VISIBLE);
+            }
+
+
+            if (obj.getUrl() != null && !obj.getUrl().isEmpty()) {
+                holder.setImageUrl(R.id.jmui_avatar_iv, obj.getUrl());
+            } else {
+                holder.setImageWord(R.id.jmui_avatar_iv, obj.getUserName());
+            }
+//            holder.setText(R.id.tv_display_name, "远程");
+
+            if(obj.getMsgType()==0) {
+                holder.setVisibility(R.id.ll_push,View.GONE);
+                holder.setVisibility(R.id.ll_common,View.VISIBLE);
+
+                holder.setText(R.id.tv_content, obj.getContent());
+
+            }else{//转账消息
+                holder.setVisibility(R.id.ll_common,View.GONE);
+                holder.setVisibility(R.id.ll_push,View.VISIBLE);
+
+                holder.setText(R.id.tv_menuName,obj.getContent()+"积分");
+
+                if(obj.getIsReceive()==0){//转账未接收
+                    holder.setText(R.id.tv_pushContent,"请收款");
+                    holder.setImageResource(R.id.ll_push,R.mipmap.pay_receive);
+                    holder.setOnClickListener(R.id.ll_push,v->{
+                       listener.onTransferClick(holder.getItemPosition(),obj);
+                    });
+                }else if(obj.getIsReceive()==1){//转账已接收
+                    holder.setText(R.id.tv_pushContent,"已被接收");
+                    holder.setImageResource(R.id.ll_push,R.mipmap.pay_receive_ok);
+                }else{//转账被接收回执
+                    holder.setText(R.id.tv_pushContent,"已收款");
+                    holder.setImageResource(R.id.ll_push,R.mipmap.pay_receive_ok);
+                }
             }
         }
+    }
+
+    public LocalDateTime trimToMinute(LocalDateTime time) {
+        if (time == null) return null;
+        // 秒和纳秒清0，只保留到 年-月-日 时:分
+        return time.withSecond(0).withNano(0);
     }
 }

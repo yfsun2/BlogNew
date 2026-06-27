@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="10dp"
+    app:cardUseCompatPadding="true"
+    app:cardPreventCornerOverlap="false">
+
+    <!-- 最外层 FrameLayout 实现悬浮效果 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
+
+        <!-- 你的内容布局（正常写） -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- 标题 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="搜索好友"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:gravity="center"/>
+
+            <!-- 搜索输入栏 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/et_search_key"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:hint="请输入昵称/账号搜索"
+                    android:textSize="15sp"
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/bg_search_edit"
+                    android:inputType="text"
+                    android:maxLines="1"/>
+
+                <Button
+                    android:id="@+id/btn_search"
+                    android:layout_width="70dp"
+                    android:layout_height="48dp"
+                    android:text="搜索"
+                    android:textSize="15sp"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/bg_search_button"
+                    android:layout_marginStart="10dp"/>
+
+            </LinearLayout>
+
+            <!-- 搜索结果列表 -->
+            <ListView
+                android:id="@+id/lv_search_result"
+                android:layout_width="match_parent"
+                android:layout_height="280dp"
+                android:layout_marginTop="20dp"
+                android:divider="#F5F5F5"
+                android:dividerHeight="1dp"
+                android:scrollbars="none"/>
+
+        </LinearLayout>
+
+        <!-- ====================== 悬浮在右上角的叉号 ====================== -->
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top|end"
+            android:padding="10dp"
+            android:src="@mipmap/ic_clear"
+            android:scaleType="centerInside"/>
+
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>

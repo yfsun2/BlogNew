@@ -1,7 +1,7 @@
 package com.syf.blognew.api;
 
 import androidx.annotation.NonNull;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.syf.blognew.pojo.ResultBody;
 import com.syf.blognew.interceptor.NetInterceptor;
 
@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -49,7 +50,7 @@ public class NetClient {
                 }
 
                 String json = response.body().string();
-                ResultBody resultBody = JSON.parseObject(json, ResultBody.class);
+                ResultBody resultBody = JSONObject.parseObject(json, ResultBody.class);
 
                 if (resultBody.getCode() == 200) {
                     String data = resultBody.getData() == null ? "" : resultBody.getData().toString();
@@ -73,7 +74,13 @@ public class NetClient {
     }
 
     // ====================== POST ======================
-    public static void post(String url, RequestBody body, NetCallBack netCallBack) {
+    public static void post(String url, Object params, NetCallBack netCallBack) {
+        RequestBody body;
+        if(params instanceof RequestBody){
+            body=(RequestBody) params;
+        }else{
+            body=RequestBody.create(JSONObject.toJSONString(params), MediaType.parse("application/json; charset=utf-8"));
+        }
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)

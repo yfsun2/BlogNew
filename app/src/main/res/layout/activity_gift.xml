@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="#f5f6fa"
+    tools:context=".activity.GiftActivity">
+
+    <!-- 顶部导航栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#FFFFFF"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:elevation="1dp">
+        <TextView
+            android:id="@+id/tv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:text="返回"
+            android:textColor="#333333"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="积分兑换"
+            android:textSize="18sp"
+            android:textColor="#333333"
+            android:textStyle="bold"
+            android:gravity="center"
+            />
+        <TextView
+            android:id="@+id/add_gift"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:text="添加"
+            android:textColor="#333333"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- 当前拥有积分 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="我的积分："
+            android:textSize="16sp"
+            android:textColor="#666666"/>
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@mipmap/ic_points"
+            />
+        <TextView
+            android:id="@+id/tv_user_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="#FF6200"
+            android:layout_marginLeft="8dp"/>
+    </LinearLayout>
+    <!--    签到-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#fff"
+        android:padding="10dp">
+
+        <!-- 连续签到天数 -->
+        <TextView
+            android:id="@+id/tv_continuous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="连签"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginTop="8dp" />
+        <!-- 日历签到网格 15天布局 -->
+        <!-- 外层横向滑动 -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:scrollbars="none">
+
+            <!-- 横向容器 用来循环addView -->
+            <LinearLayout
+                android:id="@+id/ll_sign_scroll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingHorizontal="10dp"/>
+
+        </HorizontalScrollView>
+        <!-- 签到按钮 -->
+        <Button
+            android:id="@+id/btn_sign"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="立即签到"
+            android:background="@drawable/btn_sign_selector"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"
+            android:elevation="0dp"/>
+
+    </LinearLayout>
+    <Button
+        android:id="@+id/btn_ggl"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:layout_height="48dp"
+        android:text="刮刮乐(5积分一次)"
+        android:background="@drawable/btn_selector"
+        android:textColor="#ffffff"
+        android:textSize="16sp"
+        android:layout_marginTop="10dp"
+        android:elevation="0dp"/>
+    <!-- 礼品列表 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_gifts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <EditText
+        android:id="@+id/et_old_pwd"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:hint="请输入旧密码"
+        android:inputType="textPassword"
+        android:paddingLeft="10dp"
+        android:background="@drawable/edit_bg" />
+
+    <EditText
+        android:id="@+id/et_new_pwd"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginTop="10dp"
+        android:hint="请输入新密码"
+        android:inputType="textPassword"
+        android:paddingLeft="10dp"
+        android:background="@drawable/edit_bg" />
+
+    <EditText
+        android:id="@+id/et_confirm_pwd"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginTop="10dp"
+        android:hint="请再次输入新密码"
+        android:inputType="textPassword"
+        android:paddingLeft="10dp"
+        android:background="@drawable/edit_bg" />
+
+</LinearLayout>

@@ -1,14 +1,11 @@
 package com.syf.blognew.handler;
 
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
 
 import com.syf.blognew.pojo.UserApplication;
-
-import java.util.Objects;
 
 public class ToastHandler extends Handler {
 

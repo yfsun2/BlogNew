@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            tools:context=".fragment.FriendFragment">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F0F3F6"
+    tools:context=".fragment.FriendFragment">
     <androidx.appcompat.widget.Toolbar
-        android:background="#07C160"
+        android:background="#fff"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize">
         <TextView
@@ -15,20 +16,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="好友"
-            android:textColor="@color/white"
-            android:textSize="22dp"/>
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
         <ImageButton
             android:id="@+id/btn_add_friend"
             android:layout_gravity="right"
-            android:background="@android:drawable/ic_menu_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:ignore="RtlHardcoded"/>
+            android:contentDescription="添加好友"
+            android:background="@mipmap/ic_addfriend"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="10dp"
+            />
     </androidx.appcompat.widget.Toolbar>
 
     <ListView
         android:id="@+id/list_friend"
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"/>
 </LinearLayout>

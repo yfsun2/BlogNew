@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,7 +20,7 @@ import com.syf.blognew.pojo.SendMailReq;
 import com.syf.blognew.handler.ToastHandler;
 import com.syf.blognew.pojo.req.UserAddReq;
 import com.syf.blognew.api.ApiConstant;
-import com.syf.blognew.util.EmailValidator;
+import com.syf.blognew.util.Utils;
 import com.syf.blognew.api.NetCallBack;
 import com.syf.blognew.api.NetClient;
 import com.syf.blognew.util.RandomStringUtil;
@@ -30,8 +31,9 @@ import okhttp3.RequestBody;
  public class RegisterActivity extends AppCompatActivity implements TextWatcher {
 
     private EditText name,password,password2,email,code;
-    private Button send,ok,reset;
-    private String verifyCode;
+    private Button send;
+     private Button ok;
+     private String verifyCode;
     private Context mContext;
     private int num=60;
     private boolean isSend=false;
@@ -41,11 +43,28 @@ import okhttp3.RequestBody;
 
         setContentView(R.layout.activity_register);
         mContext=this;
-        initView();
 
-        reset.setOnClickListener(v->{
-            setReset();
-        });
+        name=findViewById(R.id.name);
+        password=findViewById(R.id.password);
+        password2=findViewById(R.id.password2);
+        email=findViewById(R.id.email);
+        code=findViewById(R.id.code);
+
+        send=findViewById(R.id.send);
+        ok=findViewById(R.id.ok);
+
+
+        name.addTextChangedListener(this);
+        password.addTextChangedListener(this);
+        password2.addTextChangedListener(this);
+        email.addTextChangedListener(this);
+        code.addTextChangedListener(this);
+
+        ImageView ivClose=findViewById(R.id.iv_close);
+        ivClose.setOnClickListener(v->finish());
+
+        Button reset = findViewById(R.id.reset);
+        reset.setOnClickListener(v-> setReset());
 
         send.setOnClickListener(v->{
             //发送验证码前检查两次密码输入是否一致
@@ -53,7 +72,7 @@ import okhttp3.RequestBody;
                 ToastHandler.showToast("两次密码输入不一致");
                 password.setText("");
                 password2.setText("");
-            }else if(!EmailValidator.isValidEmail(email.getText().toString())){
+            }else if(!Utils.isValidEmail(email.getText().toString())){
                 runOnUiThread(()->{
                     ToastHandler.showToast("邮箱格式不正确");
                     email.setText("");
@@ -64,9 +83,7 @@ import okhttp3.RequestBody;
                 req.setEmail(email.getText().toString());
                 req.setTitle("验证码");
                 req.setContext("您的验证码为:"+verifyCode);
-
-                RequestBody body=RequestBody.create(MediaType.parse("application/json; charset=utf-8"), JSONObject.toJSONString(req));
-                NetClient.post(ApiConstant.SEND_MAIL, body, new NetCallBack() {
+                NetClient.post(ApiConstant.SEND_MAIL, req, new NetCallBack() {
                     @Override
                     public void onFailure(int code, String msg) {
                         runOnUiThread(()->{
@@ -119,10 +136,7 @@ import okhttp3.RequestBody;
                 req.setName(name.getText().toString());
                 req.setPassword(password.getText().toString());
                 req.setPower("用户");
-
-                RequestBody body=RequestBody.create(MediaType.parse("application/json;charset=utf-8"), JSONObject.toJSONString(req));
-
-                NetClient.post(ApiConstant.USER_REGISTER, body, new NetCallBack() {
+                NetClient.post(ApiConstant.USER_REGISTER, req, new NetCallBack() {
                     @Override
                     public void onFailure(int code, String msg) {
                         runOnUiThread(()->{
@@ -142,25 +156,6 @@ import okhttp3.RequestBody;
                 });
             }
         });
-    }
-
-    private void initView(){
-        name=findViewById(R.id.name);
-        password=findViewById(R.id.password);
-        password2=findViewById(R.id.password2);
-        email=findViewById(R.id.email);
-        code=findViewById(R.id.code);
-
-        send=findViewById(R.id.send);
-        ok=findViewById(R.id.ok);
-        reset=findViewById(R.id.reset);
-
-        name.addTextChangedListener(this);
-        password.addTextChangedListener(this);
-        password2.addTextChangedListener(this);
-        email.addTextChangedListener(this);
-        code.addTextChangedListener(this);
-
     }
 
     private void setReset(){

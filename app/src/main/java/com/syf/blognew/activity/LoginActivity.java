@@ -24,6 +24,7 @@ import com.syf.blognew.pojo.UserApplication;
 import com.syf.blognew.handler.ToastHandler;
 import com.syf.blognew.pojo.req.UserLoginReq;
 import com.syf.blognew.api.ApiConstant;
+import com.syf.blognew.pojo.vo.LoginVO;
 import com.syf.blognew.service.BackgroundNotificationService;
 import com.syf.blognew.util.ClassUtil;
 import com.syf.blognew.api.NetCallBack;
@@ -49,6 +50,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher {
         super.onCreate(savedInstanceState);
         //判断之前是否存在登录信息
         if (SpUtil.isLogin()) {
+            //开启service服务
             Intent intent = new Intent(UserApplication.getAppContext(), BackgroundNotificationService.class);
             startForegroundService(intent);
 
@@ -74,7 +76,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher {
         //监听内容改变 -> 控制按钮的点击状态
         user.addTextChangedListener(this);
         password.addTextChangedListener(this);
-        //监听EidtText的焦点变化 -> 控制是否需要捂住眼睛
+        //监听EditText的焦点变化 -> 控制是否需要捂住眼睛
         password.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus){
                 //捂住眼睛
@@ -89,41 +91,28 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher {
             UserLoginReq req=new UserLoginReq();
             req.setUserName(user.getText().toString());
             req.setPassword(password.getText().toString());
-            RequestBody body = RequestBody.create(JSONObject.toJSONString(req),MediaType.parse("application/json; charset=utf-8"));
 
-            NetClient.post(ApiConstant.USER_LOGIN, body, new NetCallBack() {
-                @Override
-                public void onFailure(int code, String msg) {
-                    runOnUiThread(()-> ToastHandler.showToast(msg));
-                }
-
-                @Override
-                public void onSuccess(String json) {
-
-                    SpUtil.setToken(json);
-
-                    NetClient.get(ApiConstant.USER_BY_NAME  + user.getText().toString(), new NetCallBack() {
-                        @Override
-                        public void onFailure(int code, String msg) {
-                           runOnUiThread(()-> ToastHandler.showToast(msg));
-                        }
-
-                        @Override
-                        public void onSuccess(String obj) {
-                            User user1=JSON.parseObject(String.valueOf(obj), User.class);
-                            SpUtil.login(user1);
-
-                            Intent intent = new Intent(UserApplication.getAppContext(), BackgroundNotificationService.class);
-                            startForegroundService(intent);
-
-                            intent=new Intent();
-                            intent.setClass(getApplicationContext(), MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
-                }
-            });
+            Runnable loginThread=()->{
+                NetClient.post(ApiConstant.USER_LOGIN, req, new NetCallBack() {
+                    @Override
+                    public void onFailure(int code, String msg) {
+                        runOnUiThread(()-> ToastHandler.showToast(msg));
+                    }
+                    @Override
+                    public void onSuccess(String json) {
+                        LoginVO vo=JSONObject.parseObject(json,LoginVO.class);
+                        SpUtil.setToken(vo.getToken());
+                        SpUtil.login(vo.getUser());
+                        Intent intent = new Intent(UserApplication.getAppContext(), BackgroundNotificationService.class);
+                        startForegroundService(intent);
+                        intent=new Intent();
+                        intent.setClass(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+            };
+            new Thread(loginThread).start();
         });
 
         registerBtn.setOnClickListener(v->{

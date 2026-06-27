@@ -38,7 +38,6 @@ public class NetInterceptor implements Interceptor {
         Response response = chain.proceed(newRequest);
         if(response.code()==401){
             SpUtil.logout();
-            UserApplication.getAppContext().sendBroadcast(new Intent(BackgroundNotificationService.ACTION_LOGOUT));
             Context context = UserApplication.getAppContext();
             if (context instanceof Activity) {
                 ((Activity) context).runOnUiThread(this::showToastAndLogin);

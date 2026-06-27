@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+       >
+
+        <!-- 礼品图片 -->
+        <ImageView
+            android:id="@+id/iv_gift_image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@mipmap/ic_launcher"
+            android:scaleType="centerCrop"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
+
+            <!-- 礼品名称 -->
+            <TextView
+                android:id="@+id/tv_gift_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="礼品名称"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"/>
+
+            <!-- 需要积分 -->
+            <TextView
+                android:id="@+id/tv_need_points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="需要积分：1000"
+                android:textSize="14sp"
+                android:textColor="#FF6200"
+                android:layout_marginTop="4dp"/>
+            <TextView
+                android:id="@+id/tv_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="剩余数量：5"
+                android:textSize="14sp"
+                android:textColor="#555"
+                android:layout_marginTop="4dp"/>
+
+
+        </LinearLayout>
+
+        <!-- 兑换按钮 / 积分不足 /库存不足-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:id="@+id/tv_exchange_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="立即兑换"
+                android:background="@drawable/btn_exchange_bg"
+                android:textColor="#ffffff"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"/>
+
+            <TextView
+                android:id="@+id/tv_edit_gift"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="编辑物品"
+                android:background="@drawable/btn_selector"
+                android:textColor="#ffffff"
+                android:visibility="visible"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"/>
+
+            <TextView
+                android:id="@+id/tv_delete_gift"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="删除物品"
+                android:background="@drawable/btn_delete"
+                android:textColor="#ffffff"
+                android:visibility="visible"
+                android:layout_marginTop="10dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

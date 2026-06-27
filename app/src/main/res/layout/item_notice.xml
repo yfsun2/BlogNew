@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- 背景图（保持比例，不变形） -->
+        <ImageView
+            android:id="@+id/iv_bg"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"
+            android:rotation="-15"
+            android:alpha="0.2"
+            android:adjustViewBounds="true"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="14dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/iv_type_icon"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="8dp"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="标题"
+                    android:textSize="15sp"
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:id="@+id/tv_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="内容"
+                    android:textSize="13sp"
+                    android:textColor="#666666"/>
+
+                <!-- 兑换礼物状态：待发货/已发货/已完成 /已同意/已拒绝-->
+                <TextView
+                    android:id="@+id/tv_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textSize="12sp"
+                    android:text="待发货"
+                    android:visibility="visible"/>
+
+                <!-- 好友申请按钮组 -->
+                <LinearLayout
+                    android:id="@+id/ll_friend_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
+
+                    <Button
+                        android:id="@+id/btn_agree"
+                        android:layout_width="70dp"
+                        android:layout_height="28dp"
+                        android:text="同意"
+                        android:textColor="@color/white"
+                        android:background="@drawable/btn_selector"
+                        android:textSize="12sp"
+                        android:padding="0dp"/>
+
+                    <Button
+                        android:id="@+id/btn_refuse"
+                        android:layout_width="70dp"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/btn_delete"
+                        android:text="拒绝"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:padding="0dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/ll_gift_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
+
+                    <Button
+                        android:id="@+id/btn_have_send"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:background="@drawable/btn_selector"
+                        android:text="发货"
+                        android:textSize="12sp"
+                        android:textColor="@color/white" />
+                    <Button
+                        android:id="@+id/btn_have_finish"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:background="@drawable/btn_finish"
+                        android:text="签收"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:textColor="@color/white" />
+                    <Button
+                        android:id="@+id/btn_have_refuse"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:background="@drawable/btn_delete"
+                        android:text="拒绝"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="12sp"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <!-- 未读红点 -->
+                <View
+                    android:id="@+id/v_unread_dot"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/dot_circle"
+                    android:layout_gravity="end"
+                    android:visibility="invisible"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+<!--                <ImageView-->
+<!--                    android:layout_width="50dp"-->
+<!--                    android:layout_height="50dp"-->
+<!--                    android:src="@mipmap/ic_exchange_suc"-->
+<!--                    />-->
+
+                <TextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="04-20 15:32:11"
+                    android:textColor="#999999"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EEEEEE"/>
+
+</LinearLayout>

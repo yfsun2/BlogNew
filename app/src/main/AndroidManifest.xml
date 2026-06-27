@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" package="com.syf.blognew">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.syf.blognew">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -12,13 +13,18 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"
+        tools:ignore="PhotoAndVideoPolicy,SelectedPhotoAccess" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"
+        tools:ignore="PhotoAndVideoPolicy,SelectedPhotoAccess" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"
+        tools:ignore="ForegroundServicesPolicy" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-
+    <!-- NFC权限 -->
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.nfc" android:required="true" />
 
     <application
         android:name=".pojo.UserApplication"
@@ -27,49 +33,82 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.Weixin"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activity.ChatActivity"/>
+        <activity
+            android:name=".activity.TransferActivity"
+            android:exported="false" />
+        <activity android:name=".activity.GiftActivity" />
+        <activity
+            android:name=".activity.ChatActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity android:name=".activity.DetailActivity" />
         <activity android:name=".activity.RegisterActivity" />
-        <activity android:name=".activity.LoginActivity"
+        <activity
+            android:name=".activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.IssueActivity" />
-        <activity android:name=".activity.MyActivity" />
+        <activity android:name=".activity.PublishActivity" />
         <activity android:name=".activity.MainActivity" />
-
-        <activity android:name="com.donkingliang.imageselector.ImageSelectorActivity"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-        android:configChanges="orientation|keyboardHidden|screenSize"/>
-
-        <activity android:name="com.donkingliang.imageselector.PreviewActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
+        <activity android:name=".activity.ModifyPayPwdActivity" />
+        <activity android:name=".activity.NoticeActivity" />
+        <activity android:name=".activity.UserSettingActivity" />
+        <activity android:name=".activity.PayCodeActivity" />
+        <activity android:name=".activity.GglActivity" />
+        <activity
+            android:name=".activity.NfcActivity"
+            android:exported="false"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <activity
-            android:name="com.donkingliang.imageselector.ClipImageActivity"
+            android:name=".activity.MyCaptureActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:stateNotNeeded="true"/>
+        <activity
+            android:name="com.donkingliang.imageselector.ImageSelectorActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.donkingliang.imageselector.PreviewActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.donkingliang.imageselector.ClipImageActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" /> <!-- 前台服务 -->
 
-        <!-- 前台服务 -->
         <service
-            android:name="com.syf.blognew.service.BackgroundNotificationService"
-            android:foregroundServiceType="dataSync"
+            android:name=".service.BackgroundNotificationService"
             android:exported="false"
-            tools:ignore="ForegroundServicePermission" />
-
-        <!-- 开机广播（可选） -->
+            android:enabled="true"
+            android:foregroundServiceType="dataSync|connectedDevice"
+            tools:ignore="ForegroundServicePermission" /> <!-- 开机广播（可选） -->
         <receiver
-            android:name="com.syf.blognew.service.BootReceiver"
+            android:name=".service.BootReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

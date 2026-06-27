@@ -7,8 +7,9 @@
     android:orientation="vertical"
     android:background="#F0F3F6"
     tools:context=".fragment.MyFragment">
+    <!--顶部栏-->
     <androidx.appcompat.widget.Toolbar
-        android:background="#07C160"
+        android:background="#fff"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize">
         <TextView
@@ -16,24 +17,82 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="我的"
-            android:textColor="@color/white"
-            android:textSize="22dp"/>
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+        <ImageView
+            android:id="@+id/iv_scan"
+            android:layout_gravity="right"
+            android:contentDescription="扫一扫"
+            android:background="@mipmap/ic_scan"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="10dp"
+            tools:ignore="RtlHardcoded" />
     </androidx.appcompat.widget.Toolbar>
-
-    <com.syf.blognew.view.RoundImageView
-        android:id="@+id/portrait"
+    <!-- 信息-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
         android:layout_marginTop="10dp"
-        android:layout_gravity="center"
-        android:src="@mipmap/backg"
-        app:type="circle"
-        android:scaleType="fitXY"
-        android:layout_width="80dp"
-        android:layout_height="80dp"/>
+        android:gravity="center_vertical">
 
+        <com.syf.blognew.view.RoundImageView
+            android:id="@+id/portrait"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/ic_default_avatar"
+            android:scaleType="fitXY"
+            app:type="round"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="zs"
+                android:textColor="@color/black"
+                android:textSize="30sp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ID:"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/tv_userid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="123456789"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <!-- 圆角-->
     <LinearLayout style="@style/wrap_layout" >
          <!-- 上圆角-->
-         <LinearLayout style="@style/top_layout">
-             <TextView style="@style/usertext" android:text="个性签名" />
+         <LinearLayout style="@style/top_layout" android:id="@+id/ll_pay_setting">
+             <ImageView android:layout_width="30dp"
+                 android:layout_height="30dp"
+                 android:src="@mipmap/ic_pay_setting"
+                 />
+             <TextView style="@style/usertext"
+                 android:text="支付设置"
+                 android:layout_marginStart="10dp"
+                 />
                <ImageView style="@style/img_arrow"/>
          </LinearLayout>
 
@@ -42,39 +101,107 @@
            <!-- 无圆角-->
         <LinearLayout style="@style/mid_layout"
                       android:clickable="true"
-                      android:id="@+id/my_introduce">
+                      android:id="@+id/ll_user_setting">
+            <ImageView android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@mipmap/ic_user_setting"
+                />
              <TextView
                      style="@style/usertext"
-                     android:clickable="false"
-                     android:text="我的资料" />
+                     android:layout_marginStart="10dp"
+                     android:text="资料设置" />
                <ImageView android:clickable="false" style="@style/img_arrow"/>
          </LinearLayout>
               <View style="@style/bg_line"/>
            <!-- 下圆角-->
-        <LinearLayout style="@style/bottom_layout">
-             <TextView style="@style/usertext" android:text="消息通知" />
+        <LinearLayout style="@style/bottom_layout" android:id="@+id/ll_notice">
+            <ImageView android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@mipmap/ic_notice"
+                />
+             <TextView style="@style/usertext"
+                 android:text="消息通知"
+                 android:layout_marginStart="10dp"
+                 />
+                <!-- 未读消息红点 -->
+                <TextView
+                    android:id="@+id/tv_unread_badge"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="end|top"
+                    android:background="@drawable/shape_badge_red"
+                    android:gravity="center"
+                    android:text="99+"
+                    android:textColor="#fff"
+                    android:textSize="14sp"
+                    android:layout_marginRight="10dp"
+                    android:visibility="gone"/>
+
                <ImageView style="@style/img_arrow"/>
          </LinearLayout>
 
      </LinearLayout>
+    <!-- 全圆角-->
+    <LinearLayout style="@style/wrap_layout">
+<!--        <LinearLayout android:id="@+id/ll_scan" style="@style/single_layout">-->
+<!--             <ImageView android:layout_width="30dp"-->
+<!--                 android:layout_height="30dp"-->
+<!--                 android:src="@mipmap/ic_scan"-->
+<!--                 />-->
+<!--             <TextView style="@style/usertext"-->
+<!--                 android:text="扫一扫"-->
+<!--                 android:layout_marginStart="10dp"-->
+<!--                 />-->
+<!--             <ImageView style="@style/img_arrow"/>-->
+<!--        </LinearLayout>-->
 
+        <View style="@style/bg_line"/>
+        <LinearLayout android:id="@+id/ll_pay_code" style="@style/single_layout">
+            <ImageView android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@mipmap/ic_pay_code"
+                />
+            <TextView style="@style/usertext"
+                android:text="收付款"
+                android:layout_marginStart="10dp"
+                />
+            <ImageView style="@style/img_arrow"/>
+        </LinearLayout>
+        <View style="@style/bg_line"/>
+        <LinearLayout android:id="@+id/ll_nfc" style="@style/single_layout">
+            <ImageView android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@mipmap/ic_nfc"
+                />
+            <TextView style="@style/usertext"
+                android:text="NFC"
+                android:layout_marginStart="10dp"
+                />
+            <ImageView style="@style/img_arrow"/>
+        </LinearLayout>
 
-          <!-- 全圆角-->
-         <LinearLayout style="@style/wrap_layout">
-             <LinearLayout style="@style/single_layout">
-                 <TextView style="@style/usertext" android:text="辅助功能"/>
-                 <ImageView style="@style/img_arrow"/>
-             </LinearLayout>
-
-         </LinearLayout>
-
+        <View style="@style/bg_line"/>
+        <LinearLayout android:id="@+id/ll_points_change" style="@style/single_layout">
+            <ImageView android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@mipmap/ic_points"
+                />
+            <TextView style="@style/usertext"
+                android:text="积分兑换"
+                android:layout_marginStart="10dp"
+                />
+            <ImageView style="@style/img_arrow"/>
+        </LinearLayout>
+    </LinearLayout>
+    <!--退出登录-->
     <Button
-        android:id="@+id/logout"
-        android:background="@drawable/button_selector"
+        android:id="@+id/btn_logout"
+        android:background="@drawable/btn_delete"
         android:layout_marginTop="30dp"
         android:layout_gravity="center"
         android:textColor="@color/white"
         android:text="退出登录"
         android:layout_width="200dp"
         android:layout_height="wrap_content"/>
+
 </LinearLayout>

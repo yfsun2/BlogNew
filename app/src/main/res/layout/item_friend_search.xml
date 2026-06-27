@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- 头像 -->
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@mipmap/ic_default_avatar"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_avatar_circle"/>
+
+    <!-- 昵称 + 账号 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="14dp">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="name"
+            android:textColor="#222222"
+            android:textStyle="normal"/>
+
+        <TextView
+            android:id="@+id/tv_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:text="1"
+            android:textColor="#888888"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <!-- 添加按钮 -->
+    <Button
+        android:id="@+id/btn_add"
+        android:layout_width="72dp"
+        android:layout_height="36dp"
+        android:text="添加"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/bg_add_button"
+        android:layout_marginStart="8dp"/>
+
+</LinearLayout>

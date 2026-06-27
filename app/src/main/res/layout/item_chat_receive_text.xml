@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout style="@style/jmui_chat_item_receive_layout"
               xmlns:android="http://schemas.android.com/apk/res/android">
-
-
     <TextView
         android:id="@+id/tv_sendtime"
         android:text="2019-02-19 15:59"
         style="@style/jmui_chat_text_date_style"/>
+    <TextView
+        android:id="@+id/tv_withdraw"
+        android:text="对方撤回了一条消息"
+        android:visibility="gone"
+        style="@style/jmui_chat_text_date_style"/>
 
-
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/ll_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:gravity="left"
+        android:orientation="horizontal"
         android:layout_marginTop="5dp">
 
         <ImageView
@@ -19,9 +25,11 @@
             style="@style/jmui_chat_item_receiver_avatar_style"/>
 
         <LinearLayout
+            android:id="@+id/ll_common"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="53dp"
+            android:layout_marginLeft="3dp"
+            android:visibility="gone"
             android:orientation="vertical">
 
             <TextView
@@ -53,10 +61,10 @@
             android:id="@+id/ll_push"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="53dp"
-            android:background="@drawable/jmui_msg_receive_bg"
+            android:layout_marginLeft="3dp"
+            android:background="@mipmap/pay_receive"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -69,7 +77,7 @@
                     android:layout_marginBottom="12.33dp"
                     android:layout_marginLeft="11dp"
                     android:layout_marginTop="13.33dp"
-                    android:background="@mipmap/icon"
+                    android:background="@mipmap/pay"
                     android:scaleType="fitXY"/>
 
                 <LinearLayout
@@ -80,13 +88,13 @@
 
                     <TextView
                         android:id="@+id/tv_menuName"
-                        android:layout_width="120dp"
+                        android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="11.33dp"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text=""
-                        android:textColor="#2C2C2C"
+                        android:text="10积分"
+                        android:textColor="#fff"
                         android:textSize="15sp"/>
 
                     <TextView
@@ -96,8 +104,8 @@
                         android:layout_marginLeft="11.33dp"
                         android:layout_marginTop="4dp"
                         android:ellipsize="end"
-                        android:text=""
-                        android:textColor="#999999"
+                        android:text="请收款"
+                        android:textColor="#fff"
                         android:textSize="12sp"/>
                 </LinearLayout>
             </LinearLayout>
@@ -115,12 +123,12 @@
                 android:layout_marginBottom="3dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="3dp"
-                android:text="消息推送"
-                android:textColor="#989898"
+                android:text="积分转账"
+                android:textColor="#fff"
                 android:textSize="10sp"/>
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </LinearLayout>

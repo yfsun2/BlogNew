@@ -1,102 +1,82 @@
 package com.syf.blognew.adapter;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.VerifiedInputEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.bumptech.glide.Glide;
 import com.syf.blognew.R;
 import com.syf.blognew.pojo.vo.BlogVO;
-import com.syf.blognew.pojo.req.CommentAddReq;
-import com.syf.blognew.pojo.vo.CommentVO;
-import com.syf.blognew.pojo.UserApplication;
-import com.syf.blognew.handler.ToastHandler;
-import com.syf.blognew.api.ApiConstant;
-import com.syf.blognew.api.NetCallBack;
-import com.syf.blognew.api.NetClient;
+import com.syf.blognew.util.Utils;
 import com.syf.blognew.websocket.WebSocketManager;
 
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-
 public class BlogAdapter extends AbstractAdapter<BlogVO> {
-    private final SimpleDateFormat sdf;
-    private final View settingView;
-    private View popupView ;
+    private View popupInputView ,popupSettingView;
     private final TextView btn_submit;
-    private int toUid,index=0;//item的index
-    private AlertDialog dialog;
+    private int toUid;//item的index
     private final Context context;
     private final EditText inputComment;
-    private PopupWindow popupWindow;
+    private PopupWindow popupInput,popupSetting;
     private final RelativeLayout rl_input_container;
     private InputMethodManager mInputManager;
     private String mInputContentText;
 
-    /**
-     * 对blogItem的回调接口，把网络请求放到fragment里，不要放在adapter里
-     */
     public interface OnBlogItemListener{
         void onAddSupport(int position);
         void onDeleteSupport(int position);
-        void onDeleteBlog(int position,AlertDialog dialog);
+        void onDeleteBlog(int position);
+        void onEditBlog(int position);
+        void onSetPrivateBlog(int position);
+        void onsetPublicBlog(int position);
         void onAddComment(int position,String content,int fromId,Integer toId);
     }
-    /**
-     * 变量接口
-     */
     private OnBlogItemListener listener;
-    /**
-     * 提供set方法
-     * @param listener
-     */
     public void setOnItemClickListener(OnBlogItemListener listener){
         this.listener=listener;
     }
 
     public BlogAdapter(List<BlogVO> mData, int mLayoutRes, Context ctx) {
         super(mData,mLayoutRes);
-        sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         context=ctx;
         LayoutInflater inflater = LayoutInflater.from(context);
-        settingView = inflater.inflate(R.layout.setting_view, null);
-        popupView = LayoutInflater.from(context).inflate(R.layout.comment_popupwindow, null);
+        popupInputView = inflater.inflate(R.layout.popup_window_comment, null);
 
-        inputComment = popupView.findViewById(R.id.et_discuss);
-        btn_submit = popupView.findViewById(R.id.btn_confirm);
-        rl_input_container = popupView.findViewById(R.id.rl_input_container);
+        inputComment = popupInputView.findViewById(R.id.et_discuss);
+        btn_submit = popupInputView.findViewById(R.id.btn_confirm);
+        rl_input_container = popupInputView.findViewById(R.id.rl_input_container);
+
+        popupSettingView=inflater.inflate(R.layout.popup_window_setting, null);
     }
 
     @Override
-    public void bindView(ViewHolder holder, BlogVO obj) {
+    public void bindView(ViewHolder holder,int position, BlogVO obj) {
 
         holder.setText(R.id.user, obj.getName());
-        holder.setText(R.id.create_time, (obj.getCreateTime() == null ? "null" : sdf.format(obj.getCreateTime())));
+        holder.setText(R.id.create_time, (obj.getCreateTime() == null ? "null" : Utils.timeFormatter(obj.getCreateTime())));
         holder.setText(R.id.from, "来自" + obj.getModel());
+
+        if(obj.getIsPrivate()==1){
+            holder.setVisibility(R.id.iv_private, View.VISIBLE);
+        }else{
+            holder.setVisibility(R.id.iv_private, View.GONE);
+        }
 
         if(obj.getUrl()!=null&&!obj.getUrl().isEmpty()){
             holder.setImageUrl(R.id.pic,obj.getUrl());
@@ -104,14 +84,14 @@ public class BlogAdapter extends AbstractAdapter<BlogVO> {
             holder.setImageWord(R.id.pic, obj.getName());
         }
         if(WebSocketManager.getInstance().getUser().getUrl()!=null&&!WebSocketManager.getInstance().getUser().getUrl().isEmpty()){
-            holder.setButtonLeftUrl(R.id.btn_comment_user, WebSocketManager.getInstance().getUser().getUrl(),8);
+            holder.setImageUrl(R.id.iv_comment_user,WebSocketManager.getInstance().getUser().getUrl());
         }else {
-            holder.setButtonLeftImg(R.id.btn_comment_user, WebSocketManager.getInstance().getUser().getName(), 8);
+            holder.setImageWord(R.id.iv_comment_user,WebSocketManager.getInstance().getUser().getName());
         }
         if(obj.getIsSupport()==0){
-            holder.setImageResource(R.id.support,R.drawable.support);
+            holder.setImageResource(R.id.support,R.mipmap.support);
         }else{
-            holder.setImageResource(R.id.support,R.drawable.support_light_full);
+            holder.setImageResource(R.id.support,R.mipmap.support_light_full);
         }
         //有点赞的人才显示点赞列表
         if(obj.getSupportList()!=null&&!obj.getSupportList().isEmpty()){
@@ -133,37 +113,24 @@ public class BlogAdapter extends AbstractAdapter<BlogVO> {
 
         //点赞
         holder.setOnClickListener(R.id.support,v->{
-            index = holder.getItemPosition();
             if(obj.getIsSupport()==0){
-                listener.onAddSupport(holder.getItemPosition());
+                listener.onAddSupport(position);
             }else{
-                listener.onDeleteSupport(holder.getItemPosition());
+                listener.onDeleteSupport(position);
             }
         });
 
         //回复某人
-        holder.setOnItemClickListener(R.id.comment_list, (parent, view, position, id) -> {
-            index = holder.getItemPosition();
-            toUid = obj.getCommentList().get(position).getFromUid();
-            showPopupComment(holder.getItemPosition());
+        holder.setOnItemClickListener(R.id.comment_list, (parent, view, pos, id) -> {
+            toUid = obj.getCommentList().get(pos).getFromUid();
+            showPopupComment(pos);
             btn_submit.setText("回复");
-            inputComment.setHint("回复：" + obj.getCommentList().get(position).getFromUser());
+            inputComment.setHint("回复：" + obj.getCommentList().get(pos).getFromUser());
         });
 
         //更多设置
-        //TODO 目前只有删除，后续改成弹出窗口
         holder.setOnClickListener(R.id.setting, v -> {
-            if (settingView.getParent() != null) {
-                ((ViewGroup) settingView.getParent()).removeView(settingView);
-            }
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-            builder.setIcon(R.mipmap.ic_launcher)
-                    .setTitle("操作")
-                    .setView(settingView)
-                    .create();
-            dialog = builder.show();
-            index = holder.getItemPosition();
+            showPopupSetting(obj,position);
         });
 
         if(!Objects.equals(obj.getUserId(), WebSocketManager.getInstance().getUser().getId())){
@@ -174,63 +141,54 @@ public class BlogAdapter extends AbstractAdapter<BlogVO> {
 
         // 评论
         holder.setOnClickListener(R.id.comment, v -> {
-            index = holder.getItemPosition();
             btn_submit.setText("评论");
             inputComment.setHint("评论:" +obj.getName());
-            showPopupComment(index);
+            showPopupComment(position);
         });
         //说点什么吧
-        holder.setOnClickListener(R.id.btn_comment_user,v->{
-            index = holder.getItemPosition();
+        holder.setOnClickListener(R.id.ll_comment_user,v->{
             btn_submit.setText("评论");
             inputComment.setHint("评论:" +obj.getName());
-            showPopupComment(index);
+            showPopupComment(position);
         });
 
         holder.setText(R.id.text, obj.getContext());
 
         holder.setImageListToGridLayout(R.id.img_grid,obj.getImageList(),context);
 
-
-        Button delete = settingView.findViewById(R.id.delete);
-
-        delete.setOnClickListener(v -> {
-           listener.onDeleteBlog(index,dialog);
-        });
     }
 
-    @SuppressLint("WrongConstant")
     private void showPopupComment(int position) {
-        if (popupView == null) {
-            popupView = LayoutInflater.from(context).inflate(R.layout.comment_popupwindow, null);
+        if (popupInputView == null) {
+            popupInputView = LayoutInflater.from(context).inflate(R.layout.popup_window_comment, null);
         }
         inputComment.setText("");
         inputComment.requestFocus();
 
-        if (popupWindow == null) {
-            popupWindow = new PopupWindow(popupView, RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT, false);
+        if (popupInput == null) {
+            popupInput = new PopupWindow(popupInputView, RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT, true);
         }
 
-        popupWindow.setTouchable(true);
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
-        popupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        popupWindow.showAtLocation(popupView, Gravity.BOTTOM, 0, 0);
-        popupWindow.update();
+        popupInput.setTouchable(true);
+//        popupWindow.setFocusable(true);
+        popupInput.setOutsideTouchable(true);
+        popupInput.setBackgroundDrawable(new ColorDrawable(0x00000000));
+        popupInput.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        popupInput.showAtLocation(popupInputView, Gravity.BOTTOM, 0, 0);
+        popupInput.update();
 
         inputComment.postDelayed(()->{
             mInputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             mInputManager.showSoftInput(inputComment, InputMethodManager.SHOW_IMPLICIT);
         },150);
 
-        popupWindow.setOnDismissListener(() -> {
+        popupInput.setOnDismissListener(() -> {
             mInputManager.hideSoftInputFromWindow(inputComment.getWindowToken(), 0);
         });
 
         rl_input_container.setOnClickListener(v -> {
-            popupWindow.dismiss();
+            popupInput.dismiss();
         });
 
         // 提交评论
@@ -242,8 +200,71 @@ public class BlogAdapter extends AbstractAdapter<BlogVO> {
                 listener.onAddComment(position,mInputContentText,WebSocketManager.getInstance().getUser().getId(), toUid);
             }
             mInputManager.hideSoftInputFromWindow(inputComment.getWindowToken(), 0);
-            popupWindow.dismiss();
+            popupInput.dismiss();
         });
+    }
+
+    private void showPopupSetting(BlogVO obj,int position){
+        if (popupSettingView == null) {
+            popupSettingView = LayoutInflater.from(context).inflate(R.layout.popup_window_setting, null);
+        }
+
+        if (popupSetting == null) {
+            popupSetting = new PopupWindow(popupSettingView, RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT, true);
+        }
+        popupSetting.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        popupSetting.setOutsideTouchable(true);
+        setWindowAlpha(0.5f); // 半透明（推荐0.5~0.7）
+
+        popupSetting.setTouchable(true);
+        popupSetting.setOutsideTouchable(true);
+        popupSetting.setBackgroundDrawable(new ColorDrawable(0x00000000));
+        popupSetting.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        popupSetting.showAtLocation(popupInputView, Gravity.BOTTOM, 0, 0);
+        popupSetting.update();
+
+        rl_input_container.setOnClickListener(v -> {
+            popupSetting.dismiss();
+        });
+
+        if(obj.getIsPrivate()==0){
+            popupSettingView.findViewById(R.id.ll_private).setVisibility(View.VISIBLE);
+            popupSettingView.findViewById(R.id.ll_public).setVisibility(View.GONE);
+        }else{
+            popupSettingView.findViewById(R.id.ll_private).setVisibility(View.GONE);
+            popupSettingView.findViewById(R.id.ll_public).setVisibility(View.VISIBLE);
+        }
+
+        //编辑
+        popupSettingView.findViewById(R.id.ll_edit).setOnClickListener(v->{
+            listener.onEditBlog(position);
+            popupSetting.dismiss();
+        });
+        //私密
+        popupSettingView.findViewById(R.id.ll_private).setOnClickListener(v->{
+            listener.onSetPrivateBlog(position);
+            popupSetting.dismiss();
+        });
+        //公开
+        popupSettingView.findViewById(R.id.ll_public).setOnClickListener(v->{
+            listener.onsetPublicBlog(position);
+            popupSetting.dismiss();
+        });
+        //删除
+        popupSettingView.findViewById(R.id.ll_delete).setOnClickListener(v->{
+            listener.onDeleteBlog(position);
+            popupSetting.dismiss();
+        });
+        popupSetting.setOnDismissListener(()-> setWindowAlpha(1.0f));
+    }
+
+    private void setWindowAlpha(float alpha) {
+        WindowManager.LayoutParams lp = ((AppCompatActivity)context).getWindow().getAttributes();
+        // 添加背景变暗标志（解决部分机型不生效问题）
+        ((AppCompatActivity)context).getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        lp.alpha = alpha; // 0.0f全透明，1.0f不透明
+        ((AppCompatActivity)context).getWindow().setAttributes(lp);
     }
 }
 

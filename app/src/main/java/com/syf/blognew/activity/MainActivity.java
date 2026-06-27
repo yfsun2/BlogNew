@@ -16,7 +16,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -32,9 +31,8 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.syf.blognew.R;
 import com.syf.blognew.fragment.FriendFragment;
-import com.syf.blognew.fragment.IndexFragment;
+import com.syf.blognew.fragment.HomeFragment;
 import com.syf.blognew.fragment.MyFragment;
-import com.syf.blognew.service.BackgroundNotificationService;
 import com.syf.blognew.util.UnReadManager;
 
 import java.util.ArrayList;
@@ -43,12 +41,14 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String[] TAB_TITLES = {"首页", "好友", "我的"};
+    private final int[] unSelectIcons = {R.mipmap.ic_index_normal, R.mipmap.ic_friend_normal, R.mipmap.ic_mine_normal};
+    private final int[] selectIcons = {R.mipmap.ic_index_selected, R.mipmap.ic_friend_selected, R.mipmap.ic_mine_selected};
     private final List<Fragment> mFragmentList = new ArrayList<>();
 
     private TabLayout mTabLayout;
     private ViewPager2 mViewPager;
 
-    TextView badgeView;
+    TextView badgeView1,badgeView2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
         initView();
         initFragments();
         setupViewPager();
-        setupTabListener();
     }
 
     // 在Activity的onCreate调用
@@ -89,17 +88,15 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
         mTabLayout = findViewById(R.id.tab_layout);
         mViewPager = findViewById(R.id.view_pager);
-        // 监听未读数字变化 → 自动刷新红点
-        // 刷新第二个 Tab 的红点
         UnReadManager.getInstance().onUnreadChangeListener = this::updateFriendBadge;
-
+        UnReadManager.getInstance().onNoticeChangeListener = this::updateNoticeBadge;
     }
 
     /**
      * 添加Fragment
      */
     private void initFragments() {
-        mFragmentList.add(IndexFragment.newInstance(TAB_TITLES[0]));
+        mFragmentList.add(HomeFragment.newInstance(TAB_TITLES[0]));
         mFragmentList.add(FriendFragment.newInstance(TAB_TITLES[1]));
         mFragmentList.add(MyFragment.newInstance(TAB_TITLES[2]));
     }
@@ -124,68 +121,59 @@ public class MainActivity extends AppCompatActivity {
         });
         new TabLayoutMediator(mTabLayout, mViewPager, (tab, position) -> {
             switch (position) {
-                case 0 -> tab.setText("首页");
+                case 0 -> {
+                    tab.setIcon(R.mipmap.ic_index_selected);
+                    tab.setText("首页");
+                }
                 case 1 -> {
+                    tab.setIcon(R.mipmap.ic_friend_normal);
                     tab.setText("好友");
-                    // 从布局文件 new 出来
-                    // 获取系统自动生成的 tabView
-                    View tabView = tab.view;
-
-                    // 加载角标布局
-                    badgeView = (TextView) LayoutInflater.from(this).inflate(R.layout.badge_view, null);
-
-                    // ✅ 关键修复：用LinearLayout.LayoutParams（系统Tab用的就是这个）
+                    ViewGroup tabView = tab.view;
+                    badgeView1 = (TextView) LayoutInflater.from(this).inflate(R.layout.badge_view, null);
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             60, 60 // 宽高
                     );
-                    // 右上角 + 微调位置
-                    params.gravity = Gravity.END | Gravity.TOP;
-                    params.rightMargin = 40;  // 往右
-                    params.topMargin = -60;    // 往上
-
-                    badgeView.setLayoutParams(params);
-                    ViewGroup viewGroup = (ViewGroup) tabView;
-                    viewGroup.addView(badgeView);
+                    params.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
+                    params.rightMargin = 60;  // 往左
+                    params.topMargin = -100;    // 往上
+                    badgeView1.setLayoutParams(params);
+                    tabView.addView(badgeView1);
                 }
-                case 2-> tab.setText("我的");
+                case 2-> {
+                    tab.setIcon(R.mipmap.ic_mine_normal);
+                    tab.setText("我的");
+                    ViewGroup tabView = tab.view;
+                    badgeView2 = (TextView) LayoutInflater.from(this).inflate(R.layout.badge_view, null);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            60, 60 // 宽高
+                    );
+                    params.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
+                    params.rightMargin = 60;  // 往左
+                    params.topMargin = -100;    // 往上
+                    badgeView2.setLayoutParams(params);
+                    tabView.addView(badgeView2);
+                }
             }
         }).attach();
-    }
 
-    /**
-     * 重复点击首页Tab → 回到顶部
-     */
-    private void setupTabListener() {
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-
+                int position = tab.getPosition();
+                tab.setIcon(selectIcons[position]);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                tab.setIcon(unSelectIcons[position]);
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                int position = tab.getPosition();
-                if (position == 0) {
-                    scrollIndexToTop();
-                }
-            }
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
     }
 
-    /**
-     * 首页列表回到顶部
-     */
-    private void scrollIndexToTop() {
-        if (!mFragmentList.isEmpty() && mFragmentList.get(0) instanceof IndexFragment indexFragment) {
-            if (indexFragment.list_blog != null) {
-                indexFragment.list_blog.smoothScrollToPositionFromTop(0, 0);
-            }
-        }
-    }
 
     /**
      * 返回键弹窗退出
@@ -206,15 +194,30 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateFriendBadge() {
         int count = UnReadManager.getInstance().friendUnreadCount;
-        if (badgeView == null) return;
+        if (badgeView1 == null) return;
         runOnUiThread(()->{
             if (count <= 0) {
                 // 没有未读 → 隐藏
-                badgeView.setVisibility(View.GONE);
+                badgeView1.setVisibility(View.GONE);
             } else {
                 // 有未读 → 显示数字
-                badgeView.setVisibility(View.VISIBLE);
-                badgeView.setText(count>99?"99+":String.valueOf(count));
+                badgeView1.setVisibility(View.VISIBLE);
+                badgeView1.setText(count>99?"99+":String.valueOf(count));
+            }
+        });
+    }
+
+    private void updateNoticeBadge() {
+        int count = UnReadManager.getInstance().noticeUnreadCount;
+        if (badgeView2 == null) return;
+        runOnUiThread(()->{
+            if (count <= 0) {
+                // 没有未读 → 隐藏
+                badgeView2.setVisibility(View.GONE);
+            } else {
+                // 有未读 → 显示数字
+                badgeView2.setVisibility(View.VISIBLE);
+                badgeView2.setText(count>99?"99+":String.valueOf(count));
             }
         });
     }

@@ -2,80 +2,54 @@ package com.syf.blognew.view;
 
 import android.content.Context;
 import android.graphics.Matrix;
-import android.graphics.PointF;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.widget.ImageView;
+import android.view.ViewConfiguration;
+import android.view.ViewParent;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
 
-public class ScaleImageView extends androidx.appcompat.widget.AppCompatImageView {
+public class ScaleImageView extends AppCompatImageView {
 
-    private Matrix matrix = new Matrix();
-    private PointF last = new PointF();
-    private ScaleGestureDetector scaleDetector;
-    private GestureDetector gestureDetector;
+    private final Matrix mMatrix = new Matrix();
+    private ScaleGestureDetector mScaleDetector;
+    private GestureDetector mGestureDetector;
 
-    private float scale = 1f;
-    private float minScale = 1f;
-    private float maxScale = 3f;
+    private float mBaseScale;
+    private float mCurrentScale;
+    private final float mMaxScale = 3.0f;
 
-    private float baseScale = 1f;
+    private float mLastX, mLastY;
+    private final int mTouchSlop;
+    private boolean mIsDrag;
 
     public ScaleImageView(Context context) {
         super(context);
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         init();
     }
 
     public ScaleImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         init();
     }
 
     private void init() {
         setScaleType(ScaleType.MATRIX);
-        scaleDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
-        gestureDetector = new GestureDetector(getContext(), new GestureListener());
+        mScaleDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
+        mGestureDetector = new GestureDetector(getContext(), new GestureListener());
     }
 
     @Override
     public void setImageDrawable(@Nullable Drawable drawable) {
         super.setImageDrawable(drawable);
-        resetMatrix();
-    }
-
-    // 核心：按原图比例自适应，不拉伸全屏
-    private void resetMatrix() {
-        Drawable d = getDrawable();
-        if (d == null) return;
-
-        float w = d.getIntrinsicWidth();
-        float h = d.getIntrinsicHeight();
-        if (w <= 0 || h <= 0) return;
-
-        float viewW = getWidth();
-        float viewH = getHeight();
-        if (viewW <= 0 || viewH <= 0) return;
-
-        float scaleW = viewW / w;
-        float scaleH = viewH / h;
-
-        // 自适应：按小的比例，保证完整显示原图
-        baseScale = Math.min(scaleW, scaleH);
-        scale = baseScale;
-
-        matrix.reset();
-        matrix.setScale(scale, scale);
-
-        // 居中
-        float transX = (viewW - w * scale) / 2f;
-        float transY = (viewH - h * scale) / 2f;
-        matrix.postTranslate(transX, transY);
-
-        setImageMatrix(matrix);
+        post(this::resetMatrix);
     }
 
     @Override
@@ -84,22 +58,109 @@ public class ScaleImageView extends androidx.appcompat.widget.AppCompatImageView
         resetMatrix();
     }
 
+    private void resetMatrix() {
+        Drawable d = getDrawable();
+        if (d == null) return;
+
+        float imgW = d.getIntrinsicWidth();
+        float imgH = d.getIntrinsicHeight();
+        float viewW = getWidth();
+        float viewH = getHeight();
+
+        mBaseScale = Math.min(viewW / imgW, viewH / imgH);
+        mCurrentScale = mBaseScale;
+
+        mMatrix.reset();
+        mMatrix.setScale(mCurrentScale, mCurrentScale);
+
+        float transX = (viewW - imgW * mCurrentScale) * 0.5f;
+        float transY = (viewH - imgH * mCurrentScale) * 0.5f;
+        mMatrix.postTranslate(transX, transY);
+
+        setImageMatrix(mMatrix);
+    }
+
+    /**
+     * 核心：限制图片边界，绝不拖出屏幕
+     */
+    private void fixMatrixBounds() {
+        if (getDrawable() == null) return;
+
+        RectF rect = new RectF(0, 0,
+                getDrawable().getIntrinsicWidth(),
+                getDrawable().getIntrinsicHeight());
+        mMatrix.mapRect(rect); // 获取图片当前实际位置
+
+        float viewW = getWidth();
+        float viewH = getHeight();
+        float dx = 0, dy = 0;
+
+        // 水平边界限制
+        if (rect.width() <= viewW) {
+            dx = (viewW - rect.width()) * 0.5f - rect.left;
+        } else if (rect.left > 0) {
+            dx = -rect.left;
+        } else if (rect.right < viewW) {
+            dx = viewW - rect.right;
+        }
+
+        // 垂直边界限制
+        if (rect.height() <= viewH) {
+            dy = (viewH - rect.height()) * 0.5f - rect.top;
+        } else if (rect.top > 0) {
+            dy = -rect.top;
+        } else if (rect.bottom < viewH) {
+            dy = viewH - rect.bottom;
+        }
+
+        mMatrix.postTranslate(dx, dy);
+        setImageMatrix(mMatrix);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        scaleDetector.onTouchEvent(event);
-        gestureDetector.onTouchEvent(event);
+        ViewParent parent = getParent();
+        if (parent != null) parent.requestDisallowInterceptTouchEvent(true);
 
-        PointF curr = new PointF(event.getX(), event.getY());
-        switch (event.getAction()) {
+        mGestureDetector.onTouchEvent(event);
+        mScaleDetector.onTouchEvent(event);
+
+        float x = event.getX();
+        float y = event.getY();
+
+        if (mScaleDetector.isInProgress()) {
+            fixMatrixBounds(); // 缩放后自动贴边
+            return true;
+        }
+
+        switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                last.set(curr);
+                mLastX = x;
+                mLastY = y;
+                mIsDrag = false;
                 break;
+
             case MotionEvent.ACTION_MOVE:
-                float dx = curr.x - last.x;
-                float dy = curr.y - last.y;
-                matrix.postTranslate(dx, dy);
-                setImageMatrix(matrix);
-                last.set(curr);
+                float dx = x - mLastX;
+                float dy = y - mLastY;
+
+                if (!mIsDrag) {
+                    mIsDrag = Math.abs(dx) > mTouchSlop || Math.abs(dy) > mTouchSlop;
+                }
+
+                if (mIsDrag) {
+                    mMatrix.postTranslate(dx, dy);
+                    fixMatrixBounds(); // 拖动时强制锁定边界
+                    mLastX = x;
+                    mLastY = y;
+                }
+                break;
+
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                mIsDrag = false;
+                fixMatrixBounds(); // 松手自动回弹
+                parent.requestDisallowInterceptTouchEvent(false);
                 break;
         }
         return true;
@@ -109,13 +170,15 @@ public class ScaleImageView extends androidx.appcompat.widget.AppCompatImageView
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             float scaleFactor = detector.getScaleFactor();
-            float newScale = scale * scaleFactor;
+            float newScale = mCurrentScale * scaleFactor;
 
-            if (newScale >= baseScale && newScale <= maxScale) {
-                scale = newScale;
-                matrix.postScale(scaleFactor, scaleFactor, detector.getFocusX(), detector.getFocusY());
-                setImageMatrix(matrix);
-            }
+            newScale = Math.max(mBaseScale, Math.min(newScale, mMaxScale));
+            float realScale = newScale / mCurrentScale;
+            mCurrentScale = newScale;
+
+            mMatrix.postScale(realScale, realScale,
+                    detector.getFocusX(), detector.getFocusY());
+            fixMatrixBounds();
             return true;
         }
     }
@@ -123,13 +186,13 @@ public class ScaleImageView extends androidx.appcompat.widget.AppCompatImageView
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            if (scale > baseScale) {
-                scale = baseScale;
+            if (mCurrentScale > mBaseScale) {
                 resetMatrix();
             } else {
-                scale = maxScale;
-                matrix.postScale(scale / baseScale, scale / baseScale, e.getX(), e.getY());
-                setImageMatrix(matrix);
+                mCurrentScale = mMaxScale;
+                mMatrix.postScale(mMaxScale / mBaseScale, mMaxScale / mBaseScale,
+                        e.getX(), e.getY());
+                fixMatrixBounds();
             }
             return true;
         }
